@@ -1,0 +1,28 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UseJavaVersion@1
+  inputs:
+    version: '17'
+    architecture: 'x64'
+
+- script: |
+    mvn clean package
+  displayName: 'Build Spring Boot Application'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: 'target/demo.jar'
+    artifactName: 'drop'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: '<YOUR_AZURE_SUBSCRIPTION>'
+    appName: '<YOUR_AZURE_APP_NAME>'
+    package: '$(System.DefaultWorkingDirectory)/drop/demo.jar'
